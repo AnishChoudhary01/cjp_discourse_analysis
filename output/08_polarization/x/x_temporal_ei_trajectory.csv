@@ -1,0 +1,4 @@
+Phase,Edges_Count,Total_Edge_Weight,Internal_Ties,External_Ties,Network_EI_Index,C1_EI,C2_EI,C3_EI,Pro_CJP_Stance_EI,Anti_CJP_Stance_EI
+Before,420,607.0,509.0,98.0,-0.6771,-0.1919,-0.1667,-0.0725,-0.6667,0.5918
+Peak,690,954.0,836.0,118.0,-0.7526,-0.239,-0.3237,-0.2113,-0.6053,0.1789
+After,612,1309.0,1173.0,136.0,-0.7922,-0.6016,-0.6347,0.2727,-0.65,0.503

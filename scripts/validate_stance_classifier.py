@@ -12,9 +12,9 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 def run_stance_validation():
     base_dir = r"c:\Users\Palak\Documents\csma_prj"
-    x_path = os.path.join(base_dir, "output", "x", "processed_data", "x_tweets_with_stance.csv")
-    r_path = os.path.join(base_dir, "output", "reddit", "processed_data", "reddit_items_with_stance.csv")
-    out_dir = os.path.join(base_dir, "output", "validation")
+    x_path = os.path.join(base_dir, "output", "06_stance_analysis", "x", "x_tweets_with_stance.csv")
+    r_path = os.path.join(base_dir, "output", "06_stance_analysis", "reddit", "reddit_items_with_stance.csv")
+    out_dir = os.path.join(base_dir, "output", "07_stance_validation")
     os.makedirs(out_dir, exist_ok=True)
 
     print("=======================================================================")

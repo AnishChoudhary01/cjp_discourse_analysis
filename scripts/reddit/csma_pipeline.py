@@ -11,9 +11,9 @@ def main():
     if not os.path.exists(dataset_dir):
         dataset_dir = os.path.join(base_dir, "dataset")
 
-    out_processed = os.path.join(base_dir, "output", "reddit", "processed_data")
-    out_viz = os.path.join(base_dir, "output", "reddit", "visualizations")
-    out_network = os.path.join(base_dir, "output", "reddit", "network")
+    out_processed = os.path.join(base_dir, "output", "01_preprocessing", "reddit")
+    out_viz = os.path.join(base_dir, "output", "02_eda", "reddit")
+    out_network = os.path.join(base_dir, "output", "03_network_analysis", "reddit")
 
     os.makedirs(out_processed, exist_ok=True)
     os.makedirs(out_viz, exist_ok=True)

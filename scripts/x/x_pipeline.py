@@ -13,9 +13,9 @@ sys.stdout.reconfigure(encoding='utf-8')
 def main():
     base_dir = r"c:\Users\Palak\Documents\csma_prj"
     dataset_x_dir = os.path.join(base_dir, "dataset", "x")
-    out_processed = os.path.join(base_dir, "output", "x", "processed_data")
-    out_viz = os.path.join(base_dir, "output", "x", "visualizations")
-    out_network = os.path.join(base_dir, "output", "x", "network")
+    out_processed = os.path.join(base_dir, "output", "01_preprocessing", "x")
+    out_viz = os.path.join(base_dir, "output", "02_eda", "x")
+    out_network = os.path.join(base_dir, "output", "03_network_analysis", "x")
 
     os.makedirs(out_processed, exist_ok=True)
     os.makedirs(out_viz, exist_ok=True)

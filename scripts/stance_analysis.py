@@ -76,12 +76,14 @@ def run_stance_pipeline():
     base_dir = r"c:\Users\Palak\Documents\csma_prj"
     
     # Paths
-    x_input_path = os.path.join(base_dir, "output", "x", "processed_data", "x_tweets_with_sentiment.csv")
-    r_input_path = os.path.join(base_dir, "output", "reddit", "processed_data", "reddit_items_with_sentiment.csv")
+    x_input_path = os.path.join(base_dir, "output", "05_sentiment_analysis", "x", "x_tweets_with_sentiment.csv")
+    r_input_path = os.path.join(base_dir, "output", "05_sentiment_analysis", "reddit", "reddit_items_with_sentiment.csv")
     
-    x_out_dir = os.path.join(base_dir, "output", "x")
-    r_out_dir = os.path.join(base_dir, "output", "reddit")
-    cross_out_dir = os.path.join(base_dir, "output", "cross_platform")
+    x_out_dir = os.path.join(base_dir, "output", "06_stance_analysis", "x")
+    r_out_dir = os.path.join(base_dir, "output", "06_stance_analysis", "reddit")
+    cross_out_dir = os.path.join(base_dir, "output", "09_cross_platform")
+    os.makedirs(x_out_dir, exist_ok=True)
+    os.makedirs(r_out_dir, exist_ok=True)
     os.makedirs(cross_out_dir, exist_ok=True)
 
     print("=======================================================================")
@@ -141,7 +143,7 @@ def run_stance_pipeline():
     x_df['stance_category'] = final_x_stance
     x_df['stance_confidence'] = final_x_conf
 
-    x_out_file = os.path.join(x_out_dir, "processed_data", "x_tweets_with_stance.csv")
+    x_out_file = os.path.join(x_out_dir, "x_tweets_with_stance.csv")
     x_df.to_csv(x_out_file, index=False, encoding='utf-8')
     print(f" -> Saved enriched X dataset with stance: {x_out_file}")
 
@@ -165,7 +167,7 @@ def run_stance_pipeline():
     r_df['stance_category'] = final_r_stance
     r_df['stance_confidence'] = final_r_conf
 
-    r_out_file = os.path.join(r_out_dir, "processed_data", "reddit_items_with_stance.csv")
+    r_out_file = os.path.join(r_out_dir, "reddit_items_with_stance.csv")
     r_df.to_csv(r_out_file, index=False, encoding='utf-8')
     print(f" -> Saved enriched Reddit dataset with stance: {r_out_file}")
 
@@ -252,7 +254,7 @@ def run_stance_pipeline():
         return summary_df
 
     x_comm_stance = generate_community_stance_summary(
-        x_df, "X", os.path.join(x_out_dir, "network", "x_community_stance_summary.csv")
+        x_df, "X", os.path.join(x_out_dir, "x_community_stance_summary.csv")
     )
     print("\n--- X Community Stance Profiles ---")
     print(x_comm_stance.to_string(index=False))
@@ -268,7 +270,7 @@ def run_stance_pipeline():
     print("    showing observable variation across communities rather than complete ideological segregation.]")
 
     reddit_comm_stance = generate_community_stance_summary(
-        r_df, "Reddit", os.path.join(r_out_dir, "network", "reddit_community_stance_summary.csv")
+        r_df, "Reddit", os.path.join(r_out_dir, "reddit_community_stance_summary.csv")
     )
     print("\n--- Reddit Community Stance Profiles ---")
     print(reddit_comm_stance.to_string(index=False))
@@ -309,7 +311,7 @@ def run_stance_pipeline():
                 'Neutral_Pct': round(float(sp.get('Neutral', 0.0)), 2)
             })
         phase_stance_df = pd.DataFrame(phase_records)
-        phase_csv = os.path.join(x_out_dir, "network", "x_temporal_stance_summary.csv")
+        phase_csv = os.path.join(x_out_dir, "x_temporal_stance_summary.csv")
         phase_stance_df.to_csv(phase_csv, index=False, encoding='utf-8')
         print(f" -> Saved temporal stance summary: {phase_csv}")
         print("\n--- X Temporal Stance Trajectory ---")
@@ -395,7 +397,7 @@ def run_stance_pipeline():
     plt.setp(ax.get_xticklabels(), rotation=0)
     plt.legend(title='Target Stance', loc='lower right', frameon=True)
     plt.tight_layout()
-    v2_path = os.path.join(x_out_dir, "visualizations", "x_community_stance_distributions.png")
+    v2_path = os.path.join(x_out_dir, "x_community_stance_distributions.png")
     plt.savefig(v2_path, dpi=300)
     plt.close()
     print(f" -> Saved {v2_path}")
@@ -413,7 +415,7 @@ def run_stance_pipeline():
     plt.setp(ax.get_xticklabels(), rotation=0)
     plt.legend(title='Target Stance', loc='lower right', frameon=True)
     plt.tight_layout()
-    v3_path = os.path.join(r_out_dir, "visualizations", "reddit_community_stance_distributions.png")
+    v3_path = os.path.join(r_out_dir, "reddit_community_stance_distributions.png")
     plt.savefig(v3_path, dpi=300)
     plt.close()
     print(f" -> Saved {v3_path}")
@@ -460,7 +462,7 @@ def run_stance_pipeline():
         plt.setp(ax.get_xticklabels(), rotation=0)
         plt.legend(title='Target Stance', loc='upper right', frameon=True)
         plt.tight_layout()
-        v5_path = os.path.join(x_out_dir, "visualizations", "x_temporal_stance_shift.png")
+        v5_path = os.path.join(x_out_dir, "x_temporal_stance_shift.png")
         plt.savefig(v5_path, dpi=300)
         plt.close()
         print(f" -> Saved {v5_path}")

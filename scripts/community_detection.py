@@ -290,22 +290,22 @@ def main():
     base_dir = r"c:\Users\Palak\Documents\csma_prj"
 
     # 1. Run for X (Twitter) Network
-    x_edges = os.path.join(base_dir, "output", "x", "network", "x_edges.csv")
-    x_nodes = os.path.join(base_dir, "output", "x", "network", "x_nodes.csv")
-    x_text = os.path.join(base_dir, "output", "x", "processed_data", "processed_x_tweets.csv")
-    x_out_net = os.path.join(base_dir, "output", "x", "network")
-    x_out_viz = os.path.join(base_dir, "output", "x", "visualizations")
+    x_edges = os.path.join(base_dir, "output", "03_network_analysis", "x", "x_edges.csv")
+    x_nodes = os.path.join(base_dir, "output", "03_network_analysis", "x", "x_nodes.csv")
+    x_text = os.path.join(base_dir, "output", "01_preprocessing", "x", "processed_x_tweets.csv")
+    x_out_dir = os.path.join(base_dir, "output", "04_community_detection", "x")
+    os.makedirs(x_out_dir, exist_ok=True)
 
-    x_res = run_community_pipeline("x", x_edges, x_nodes, x_text, x_out_net, x_out_viz)
+    x_res = run_community_pipeline("x", x_edges, x_nodes, x_text, x_out_dir, x_out_dir)
 
     # 2. Run for Reddit Network
-    reddit_edges = os.path.join(base_dir, "output", "reddit", "network", "edges.csv")
-    reddit_nodes = os.path.join(base_dir, "output", "reddit", "network", "nodes.csv")
-    reddit_text = os.path.join(base_dir, "output", "reddit", "processed_data", "processed_comments.csv")
-    reddit_out_net = os.path.join(base_dir, "output", "reddit", "network")
-    reddit_out_viz = os.path.join(base_dir, "output", "reddit", "visualizations")
+    reddit_edges = os.path.join(base_dir, "output", "03_network_analysis", "reddit", "edges.csv")
+    reddit_nodes = os.path.join(base_dir, "output", "03_network_analysis", "reddit", "nodes.csv")
+    reddit_text = os.path.join(base_dir, "output", "01_preprocessing", "reddit", "processed_comments.csv")
+    reddit_out_dir = os.path.join(base_dir, "output", "04_community_detection", "reddit")
+    os.makedirs(reddit_out_dir, exist_ok=True)
 
-    reddit_res = run_community_pipeline("reddit", reddit_edges, reddit_nodes, reddit_text, reddit_out_net, reddit_out_viz)
+    reddit_res = run_community_pipeline("reddit", reddit_edges, reddit_nodes, reddit_text, reddit_out_dir, reddit_out_dir)
 
     print("\n=======================================================")
     print("      COMMUNITY DETECTION & VISUALIZATION COMPLETE     ")

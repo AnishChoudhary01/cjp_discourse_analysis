@@ -74,18 +74,18 @@ def run_sentiment_pipeline():
     base_dir = r"c:\Users\Palak\Documents\csma_prj"
     
     # Paths
-    x_tweets_path = os.path.join(base_dir, "output", "x", "processed_data", "processed_x_tweets.csv")
-    x_nodes_path = os.path.join(base_dir, "output", "x", "network", "x_nodes_with_communities.csv")
-    x_out_viz = os.path.join(base_dir, "output", "x", "visualizations")
-    x_out_net = os.path.join(base_dir, "output", "x", "network")
-    x_out_data = os.path.join(base_dir, "output", "x", "processed_data")
+    x_tweets_path = os.path.join(base_dir, "output", "01_preprocessing", "x", "processed_x_tweets.csv")
+    x_nodes_path = os.path.join(base_dir, "output", "04_community_detection", "x", "x_nodes_with_communities.csv")
+    x_out_dir = os.path.join(base_dir, "output", "05_sentiment_analysis", "x")
 
-    reddit_posts_path = os.path.join(base_dir, "output", "reddit", "processed_data", "processed_posts.csv")
-    reddit_comments_path = os.path.join(base_dir, "output", "reddit", "processed_data", "processed_comments.csv")
-    reddit_nodes_path = os.path.join(base_dir, "output", "reddit", "network", "reddit_nodes_with_communities.csv")
-    reddit_out_viz = os.path.join(base_dir, "output", "reddit", "visualizations")
-    reddit_out_net = os.path.join(base_dir, "output", "reddit", "network")
-    cross_out_dir = os.path.join(base_dir, "output", "cross_platform")
+    reddit_posts_path = os.path.join(base_dir, "output", "01_preprocessing", "reddit", "processed_posts.csv")
+    reddit_comments_path = os.path.join(base_dir, "output", "01_preprocessing", "reddit", "processed_comments.csv")
+    reddit_nodes_path = os.path.join(base_dir, "output", "04_community_detection", "reddit", "reddit_nodes_with_communities.csv")
+    reddit_out_dir = os.path.join(base_dir, "output", "05_sentiment_analysis", "reddit")
+    cross_out_dir = os.path.join(base_dir, "output", "09_cross_platform")
+
+    os.makedirs(x_out_dir, exist_ok=True)
+    os.makedirs(reddit_out_dir, exist_ok=True)
     os.makedirs(cross_out_dir, exist_ok=True)
 
     print("=======================================================================")
@@ -124,7 +124,7 @@ def run_sentiment_pipeline():
         x_df['Community'] = 'Unassigned'
 
     # Save enriched tweets
-    x_out_file = os.path.join(x_out_data, "x_tweets_with_sentiment.csv")
+    x_out_file = os.path.join(x_out_dir, "x_tweets_with_sentiment.csv")
     x_df.to_csv(x_out_file, index=False, encoding='utf-8')
     print(f" -> Saved enriched X dataset: {x_out_file}")
 
@@ -166,7 +166,7 @@ def run_sentiment_pipeline():
         r_df['Community'] = 'Unassigned'
 
     # Save enriched Reddit items
-    reddit_out_file = os.path.join(reddit_out_data, "reddit_items_with_sentiment.csv")
+    reddit_out_file = os.path.join(reddit_out_dir, "reddit_items_with_sentiment.csv")
     r_df.to_csv(reddit_out_file, index=False, encoding='utf-8')
     print(f" -> Saved enriched Reddit dataset: {reddit_out_file}")
 
@@ -368,16 +368,16 @@ def run_sentiment_pipeline():
         
         return summary_comm_df
 
-    x_dunn_path = os.path.join(x_out_net, "x_community_sentiment_dunn_posthoc.csv")
+    x_dunn_path = os.path.join(x_out_dir, "x_community_sentiment_dunn_posthoc.csv")
     x_comm_summary = analyze_communities_sentiment(
-        x_df, "X", os.path.join(x_out_net, "x_community_sentiment_summary.csv"), x_dunn_path
+        x_df, "X", os.path.join(x_out_dir, "x_community_sentiment_summary.csv"), x_dunn_path
     )
     print("\n--- X (Twitter) Community Sentiment Profiles ---")
     print(x_comm_summary[['Community', 'Items_Count', 'Coverage_Share_Pct', 'Mean_Compound', 'Median_Compound', 'Negative_Pct', 'Positive_Pct', 'Bimodality_BC']].to_string(index=False))
 
-    reddit_dunn_path = os.path.join(reddit_out_net, "reddit_community_sentiment_dunn_posthoc.csv")
+    reddit_dunn_path = os.path.join(reddit_out_dir, "reddit_community_sentiment_dunn_posthoc.csv")
     reddit_comm_summary = analyze_communities_sentiment(
-        r_df, "Reddit", os.path.join(reddit_out_net, "reddit_community_sentiment_summary.csv"), reddit_dunn_path
+        r_df, "Reddit", os.path.join(reddit_out_dir, "reddit_community_sentiment_summary.csv"), reddit_dunn_path
     )
     print("\n--- Reddit Community Sentiment Profiles ---")
     print(reddit_comm_summary[['Community', 'Items_Count', 'Coverage_Share_Pct', 'Mean_Compound', 'Median_Compound', 'Negative_Pct', 'Positive_Pct', 'Bimodality_BC']].to_string(index=False))
@@ -456,7 +456,7 @@ def run_sentiment_pipeline():
                 "Note: 1,995 of 3,447 tweets (57.9%) match detected network communities (C1–C6 + Other). 1,452 tweets (42.1%) are authored by isolated broadcasters\noutside the mention/retweet graph; their median sentiment is -0.316 (unclustered) vs -0.318 (matched). Red marker: mean; black line: median.",
                 ha='center', fontsize=8.5, style='italic')
     plt.subplots_adjust(bottom=0.15)
-    v2_path = os.path.join(x_out_viz, "x_community_sentiment_distributions.png")
+    v2_path = os.path.join(x_out_dir, "x_community_sentiment_distributions.png")
     plt.savefig(v2_path, dpi=300)
     plt.close()
     print(f" -> Saved {v2_path}")
@@ -489,7 +489,7 @@ def run_sentiment_pipeline():
                 "Note: 1,957 of 2,040 items (95.9%) match detected network communities (C1–C6 + Other). 83 items (4.1%) are unclustered.\nHigh coverage is achieved via hierarchical comment reply trees. Red marker: mean; black line: median.",
                 ha='center', fontsize=8.5, style='italic')
     plt.subplots_adjust(bottom=0.15)
-    v3_path = os.path.join(reddit_out_viz, "reddit_community_sentiment_distributions.png")
+    v3_path = os.path.join(reddit_out_dir, "reddit_community_sentiment_distributions.png")
     plt.savefig(v3_path, dpi=300)
     plt.close()
     print(f" -> Saved {v3_path}")

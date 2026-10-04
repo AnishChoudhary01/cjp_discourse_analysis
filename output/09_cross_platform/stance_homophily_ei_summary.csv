@@ -1,0 +1,5 @@
+Platform,Stance_Group,Internal_Ties_to_Same,External_Ties_to_Opposite,Stance_EI_Index,Pattern
+X (Twitter),Pro-CJP,422.0,92.0,-0.642,Inward Homophilic Interaction
+X (Twitter),Anti-CJP,101.0,261.0,0.442,Cross-Stance Outward Engagement
+Reddit,Pro-CJP,1123.0,265.0,-0.6182,Inward Homophilic Interaction
+Reddit,Anti-CJP,137.0,326.0,0.4082,Cross-Stance Outward Engagement
