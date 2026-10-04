@@ -316,7 +316,7 @@ def run_stance_pipeline():
         print(phase_stance_df.to_string(index=False))
 
     # -------------------------------------------------------------------------
-    # 8. Crucial Empirical Validation: Sentiment vs. Stance Contingency Matrix
+    # 8. Crucial Empirical Observation: Decoupling Sentiment from Stance
     # -------------------------------------------------------------------------
     print("\n[Step 8] Evaluating Stance vs. Emotional Valence Contingency Matrix...")
     print("Methodological Question: Does negative sentiment indicate opposition to CJP?")
@@ -331,9 +331,9 @@ def run_stance_pipeline():
     print(contingency_x)
     print("\nCross-Tabulation on X (Row Percentages %):")
     print(contingency_norm.round(2))
-    print(f"\nEmpirical Finding: {pro_neg_pct:.2f}% of Pro-CJP tweets have NEGATIVE emotional valence!")
+    print(f"\nEmpirical Observation: {pro_neg_pct:.2f}% of Pro-CJP tweets have NEGATIVE emotional valence.")
     print(f"Meanwhile, {anti_neg_pct:.2f}% of Anti-CJP tweets also have NEGATIVE emotional valence.")
-    print("Conclusion: Emotional valence reflects protest grievance / institutional critique, NOT ideological stance.")
+    print("Conclusion: Emotional valence reflects affective tone, NOT target-specific stance.")
 
     # Save contingency matrix
     contingency_csv = os.path.join(cross_out_dir, "stance_sentiment_contingency_table.csv")
@@ -359,20 +359,20 @@ def run_stance_pipeline():
     }, index=['X (Twitter)', 'Reddit'])
 
     cat_comp.plot(kind='bar', ax=axes[0], color=['#2CA02C', '#D62728', '#7F7F7F'], edgecolor='white', width=0.6)
-    axes[0].set_title('Grouped Comparison of Ideological Stance', fontweight='bold', fontsize=11)
+    axes[0].set_title('Grouped Comparison of Target-Specific Stance', fontweight='bold', fontsize=11)
     axes[0].set_xlabel('Platform', fontsize=10)
     axes[0].set_ylabel('Percentage (%)', fontsize=10)
     axes[0].set_ylim(0, 100)
     plt.setp(axes[0].get_xticklabels(), rotation=0)
-    axes[0].legend(title='Stance', loc='upper right', frameon=True)
+    axes[0].legend(title='Target Stance', loc='upper right', frameon=True)
 
     cat_comp.plot(kind='bar', stacked=True, ax=axes[1], color=['#2CA02C', '#D62728', '#7F7F7F'], edgecolor='white', width=0.5)
-    axes[1].set_title('Stacked Stance Composition', fontweight='bold', fontsize=11)
+    axes[1].set_title('Stacked Target-Specific Stance Composition', fontweight='bold', fontsize=11)
     axes[1].set_xlabel('Platform', fontsize=10)
     axes[1].set_ylabel('Percentage (%)', fontsize=10)
     axes[1].set_ylim(0, 100)
     plt.setp(axes[1].get_xticklabels(), rotation=0)
-    axes[1].legend(title='Stance', loc='lower right', frameon=True)
+    axes[1].legend(title='Target Stance', loc='lower right', frameon=True)
 
     fig.suptitle(f"Cross-Platform Target-Specific Stance Comparison: X vs. Reddit\n(Target: CJP Protest Movement | Chi-Square = {chi2_cross:.2f}, p = {p_cross:.4e})",
                  fontsize=12, fontweight='bold', y=0.98)
@@ -387,7 +387,7 @@ def run_stance_pipeline():
     ax = plt.subplot(111)
     x_plot_data = x_comm_stance.set_index('Community')[['Pro_CJP_Pct', 'Anti_CJP_Pct', 'Neutral_Pct']]
     x_plot_data.plot(kind='bar', stacked=True, ax=ax, color=['#2CA02C', '#D62728', '#7F7F7F'], edgecolor='white', width=0.6)
-    plt.title(f"X (Twitter) Community Stance Distribution Across Louvain Communities\n(Chi-Square = {chi2_cx:.2f}, p = {p_cx:.4e} | Cramer's V = {cramers_v_cx:.3f}: Small-to-Moderate Association)\nC4 & C6 exhibit ~40-44% Anti-CJP discourse vs <4% in C5",
+    plt.title(f"X (Twitter) Stance Breakdown Across Louvain Interaction Communities\n(Chi-Square = {chi2_cx:.2f}, p = {p_cx:.4e} | Cramer's V = {cramers_v_cx:.3f}: Small-to-Moderate Association)\nNote: Communities are structural interaction clusters, not homogeneous ideological echo chambers",
               fontsize=11, fontweight='bold', pad=15)
     plt.xlabel('Louvain Interaction Community', fontsize=10)
     plt.ylabel('Percentage (%)', fontsize=10)
@@ -405,7 +405,7 @@ def run_stance_pipeline():
     ax = plt.subplot(111)
     r_plot_data = reddit_comm_stance.set_index('Community')[['Pro_CJP_Pct', 'Anti_CJP_Pct', 'Neutral_Pct']]
     r_plot_data.plot(kind='bar', stacked=True, ax=ax, color=['#2CA02C', '#D62728', '#7F7F7F'], edgecolor='white', width=0.6)
-    plt.title(f"Reddit Community Stance Distribution Across Louvain Communities\n(Chi-Square = {chi2_cr:.2f}, p = {p_cr:.4f} | Cramer's V = {cramers_v_cr:.3f}: Small Effect Size)",
+    plt.title(f"Reddit Stance Breakdown Across Louvain Interaction Communities\n(Chi-Square = {chi2_cr:.2f}, p = {p_cr:.4f} | Cramer's V = {cramers_v_cr:.3f}: Small Effect Size)\nNote: Structural reply clusters exhibit diversity rather than ideological segregation",
               fontsize=11, fontweight='bold', pad=15)
     plt.xlabel('Louvain Interaction Community', fontsize=10)
     plt.ylabel('Percentage (%)', fontsize=10)
@@ -424,7 +424,7 @@ def run_stance_pipeline():
     # X Heatmap
     sns.heatmap(contingency_norm[['Negative', 'Neutral', 'Positive']].loc[['Pro-CJP', 'Anti-CJP', 'Neutral']], 
                 annot=True, fmt='.1f', cmap='YlOrRd', ax=axes[0], cbar=False, annot_kws={"fontsize": 11, "fontweight": "bold"})
-    axes[0].set_title("X (Twitter): Emotional Valence % by Stance\n(Row % sums to 100)", fontweight='bold', fontsize=11)
+    axes[0].set_title("X (Twitter): Emotional Valence % by Target Stance\n(Row % sums to 100)", fontweight='bold', fontsize=11)
     axes[0].set_xlabel("VADER Sentiment Valence", fontsize=10)
     axes[0].set_ylabel("Target-Specific Stance", fontsize=10)
 
@@ -432,31 +432,33 @@ def run_stance_pipeline():
     r_cont_norm = pd.crosstab(r_df['stance_category'], r_df['sentiment_category'], normalize='index') * 100
     sns.heatmap(r_cont_norm[['Negative', 'Neutral', 'Positive']].loc[['Pro-CJP', 'Anti-CJP', 'Neutral']], 
                 annot=True, fmt='.1f', cmap='Blues', ax=axes[1], cbar=False, annot_kws={"fontsize": 11, "fontweight": "bold"})
-    axes[1].set_title("Reddit: Emotional Valence % by Stance\n(Row % sums to 100)", fontweight='bold', fontsize=11)
+    axes[1].set_title("Reddit: Emotional Valence % by Target Stance\n(Row % sums to 100)", fontweight='bold', fontsize=11)
     axes[1].set_xlabel("VADER Sentiment Valence", fontsize=10)
     axes[1].set_ylabel("Target-Specific Stance", fontsize=10)
 
-    fig.suptitle("Empirical Proof: Emotional Valence Sentiment ≠ Political Stance\n(Notice 73.4% of Pro-CJP tweets have NEGATIVE valence due to protest grievance against exam leaks)",
-                 fontsize=12, fontweight='bold', y=0.99)
+    fig.suptitle("Empirical Observation: Dissociation of Emotional Valence Sentiment and Target-Specific Stance\n(73.5% of Pro-CJP items carry NEGATIVE valence, demonstrating that negative tone does not equate to opposition toward the target)",
+                 fontsize=11.5, fontweight='bold', y=0.99)
     plt.tight_layout()
     v4_path = os.path.join(cross_out_dir, "sentiment_vs_stance_contingency.png")
     plt.savefig(v4_path, dpi=300)
     plt.close()
     print(f" -> Saved {v4_path}")
 
-    # Plot 5: Temporal Stance Shift on X (Before, Peak, After)
+    # Plot 5: Temporal Stance Shift on X (Before, Peak, After) with Sample Size (n)
     if phase_col:
         plt.figure(figsize=(10, 5))
         ax = plt.subplot(111)
-        p_plot = phase_stance_df.set_index('Phase')[['Pro_CJP_Pct', 'Anti_CJP_Pct', 'Neutral_Pct']]
+        phase_plot_df = phase_stance_df.copy()
+        phase_plot_df['Phase_Label'] = phase_plot_df.apply(lambda r: f"{r['Phase']}\n(n={int(r['Total_Tweets']):,})", axis=1)
+        p_plot = phase_plot_df.set_index('Phase_Label')[['Pro_CJP_Pct', 'Anti_CJP_Pct', 'Neutral_Pct']]
         p_plot.plot(kind='bar', ax=ax, color=['#2CA02C', '#D62728', '#7F7F7F'], edgecolor='white', width=0.6)
-        plt.title('Evolution of Stance Proportions Across Protest Phases on X (Twitter)\n(Before vs. Peak vs. After)',
+        plt.title('Evolution of Target-Specific Stance Proportions Across Protest Phases on X (Twitter)\n(Proportional stability maintained despite ~10x surge in Peak phase volume)',
                   fontsize=11, fontweight='bold', pad=15)
-        plt.xlabel('Protest Temporal Phase', fontsize=10)
+        plt.xlabel('Protest Temporal Phase & Sample Size (n)', fontsize=10)
         plt.ylabel('Percentage (%)', fontsize=10)
         plt.ylim(0, 100)
         plt.setp(ax.get_xticklabels(), rotation=0)
-        plt.legend(title='Stance', loc='upper right', frameon=True)
+        plt.legend(title='Target Stance', loc='upper right', frameon=True)
         plt.tight_layout()
         v5_path = os.path.join(x_out_dir, "visualizations", "x_temporal_stance_shift.png")
         plt.savefig(v5_path, dpi=300)
@@ -467,15 +469,17 @@ def run_stance_pipeline():
     print("           STANCE DETECTION & POLARIZATION MODULE COMPLETE             ")
     print("=======================================================================")
     print("Key Findings:")
-    print(" 1. Established true ideological alignment: Pro-CJP (75.3% on X, 72.5% on Reddit)")
-    print("    vs Anti-CJP (23.2% on X, 26.5% on Reddit).")
-    print(" 2. Proved that Emotional Valence ≠ Political Stance:")
-    print(f"    73.36% of Pro-CJP tweets are scored NEGATIVE by VADER because they express")
-    print("    righteous indignation and grievance over exam irregularities.")
-    print(f" 3. Community stance distribution: C6 (Counter-Narrative) and C4")
-    print("    (Institutional Tagging) concentrate ~40-44% Anti-CJP discourse, while")
-    print("    C5 concentrates 93.9% Pro-CJP discourse (Chi-Square p = 2.86e-07; Cramer's V = 0.1671 indicates small-to-moderate association).")
-    print("    Note: Polarization remains unclaimed until network boundary interaction analysis (E-I index) is performed.")
+    print(" 1. Established target-specific stance distribution: Pro-CJP (75.5% on X, 71.2% on Reddit)")
+    print("    vs Anti-CJP (23.0% on X, 27.8% on Reddit).")
+    print(" 2. Observed Dissociation: Emotional Valence Sentiment ≠ Target-Specific Stance:")
+    print(f"    {pro_neg_pct:.2f}% of Pro-CJP items carry NEGATIVE emotional valence,")
+    print("    demonstrating that negative emotional tone does not denote opposition to the target.")
+    print(" 3. Community stance distribution: Structural communities C4 and C6")
+    print("    concentrate ~40-44% Anti-CJP discourse, while C5 concentrates 93.9% Pro-CJP discourse")
+    print(f"    (Chi-Square p = {p_cx:.2e}; Cramer's V = {cramers_v_cx:.4f}: small-to-moderate association).")
+    print(" 4. Modularity Caveat: Louvain clusters represent structural interaction communities,")
+    print("    NOT ideological silos or echo chambers. Echo chamber dynamics remain unestablished")
+    print("    until network boundary interaction analysis (Krackhardt E-I index) is executed.")
     print("=======================================================================")
 
 if __name__ == "__main__":
