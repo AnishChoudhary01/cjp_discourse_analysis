@@ -1,0 +1,6 @@
+Stance_Class,Precision,Recall,F1_Score,Support
+Pro-CJP,0.775,0.9254,0.8435,67
+Anti-CJP,0.9286,0.9028,0.9155,72
+Neutral/Unclear,0.9333,0.6829,0.7887,41
+Macro Average,0.879,0.837,0.8493,180
+Weighted Average,0.8725,0.8611,0.8598,180

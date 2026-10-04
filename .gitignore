@@ -1,0 +1,28 @@
+# Project Documentation (per user configuration)
+docs/
+
+# Python byte-code and caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# PyVis temporary local bundles
+lib/
+
+# Virtual Environments
+venv/
+.venv/
+env/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# IDE and Editor configuration
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Operating System files
+.DS_Store
+Thumbs.db
