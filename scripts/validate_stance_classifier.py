@@ -5,10 +5,33 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.metrics import classification_report, confusion_matrix, precision_recall_fscore_support
-
 # Ensure UTF-8 standardisation on Windows terminal
 sys.stdout.reconfigure(encoding='utf-8')
+
+def compute_confusion_and_metrics(y_true, y_pred, classes):
+    """Compute confusion matrix and precision/recall/f1 metrics using pure NumPy."""
+    cm = np.zeros((len(classes), len(classes)), dtype=int)
+    class_map = {c: i for i, c in enumerate(classes)}
+    for t, p in zip(y_true, y_pred):
+        if t in class_map and p in class_map:
+            cm[class_map[t], class_map[p]] += 1
+            
+    p = []
+    r = []
+    f1 = []
+    support = []
+    for i, c in enumerate(classes):
+        tp = cm[i, i]
+        fp = cm[:, i].sum() - tp
+        fn = cm[i, :].sum() - tp
+        prec = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+        rec = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+        f = (2 * prec * rec) / (prec + rec) if (prec + rec) > 0 else 0.0
+        p.append(prec)
+        r.append(rec)
+        f1.append(f)
+        support.append(cm[i, :].sum())
+    return cm, np.array(p), np.array(r), np.array(f1), np.array(support)
 
 def run_stance_validation():
     base_dir = r"c:\Users\Palak\Documents\csma_prj"
@@ -144,8 +167,8 @@ def run_stance_validation():
 
     # Metrics calculation
     classes = ['Pro-CJP', 'Anti-CJP', 'Neutral/Unclear']
-    p, r, f1, support = precision_recall_fscore_support(
-        sample_df['ground_truth_stance'], sample_df['mapped_predicted_stance'], labels=classes, zero_division=0
+    cm, p, r, f1, support = compute_confusion_and_metrics(
+        sample_df['ground_truth_stance'], sample_df['mapped_predicted_stance'], classes
     )
 
     metrics_df = pd.DataFrame({
@@ -188,14 +211,13 @@ def run_stance_validation():
     print(f"Overall Accuracy: {sample_df['is_correct'].mean() * 100:.2f}% (N = 180 stratified items)")
 
     # Confusion Matrix
-    cm = confusion_matrix(sample_df['ground_truth_stance'], sample_df['mapped_predicted_stance'], labels=classes)
     cm_df = pd.DataFrame(cm, index=[f"True {c}" for c in classes], columns=[f"Pred {c}" for c in classes])
 
     print("\n--- Confusion Matrix ---")
     print(cm_df)
 
     # Plot Confusion Matrix
-    plt.figure(figsize=(8, 6.5))
+    plt.figure(figsize=(8.5, 6.8))
     sns.set_theme(style="white")
     plt.rcParams['font.sans-serif'] = 'DejaVu Sans'
 
@@ -218,7 +240,7 @@ def run_stance_validation():
     plt.tight_layout()
 
     out_cm_path = os.path.join(out_dir, "stance_validation_confusion_matrix.png")
-    plt.savefig(out_cm_path, dpi=300)
+    plt.savefig(out_cm_path, dpi=300, bbox_inches='tight')
     plt.close()
     print(f" -> Saved validation confusion matrix plot: {out_cm_path}")
 

@@ -432,7 +432,7 @@ def run_sentiment_pipeline():
     comm_order = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'Other']
     x_filtered_comm = x_df[x_df['Community'].isin(comm_order)].copy()
 
-    plt.figure(figsize=(12, 6.2))
+    plt.figure(figsize=(12, 6.8))
     ax = plt.subplot(111)
     sns.boxplot(data=x_filtered_comm, x='Community', y='sentiment_compound', hue='Community', order=comm_order,
                 palette='Set3', ax=ax, showmeans=True, legend=False,
@@ -446,7 +446,7 @@ def run_sentiment_pipeline():
                     ha='center', va='bottom', fontsize=8.5, fontweight='semibold')
 
     plt.title('X (Twitter) Sentiment Score Distribution Across Louvain Communities\n(N = 1,995 matched tweets / 57.9% coverage; 1,452 unclustered broadcast tweets excluded)\nKruskal-Wallis H = 12.44, p = 0.029 | Dunn Post-Hoc: Only C2 vs C4 differs significantly (Bonferroni p = 0.024)', 
-              fontsize=11, fontweight='bold', pad=25)
+              fontsize=11, fontweight='bold', pad=14)
     plt.xlabel('Interaction-Based Community', fontsize=11)
     plt.ylabel('VADER Compound Score', fontsize=11)
     plt.ylim(-1.15, 1.30)
@@ -455,9 +455,9 @@ def run_sentiment_pipeline():
     plt.figtext(0.5, 0.01, 
                 "Note: 1,995 of 3,447 tweets (57.9%) match detected network communities (C1–C6 + Other). 1,452 tweets (42.1%) are authored by isolated broadcasters\noutside the mention/retweet graph; their median sentiment is -0.316 (unclustered) vs -0.318 (matched). Red marker: mean; black line: median.",
                 ha='center', fontsize=8.5, style='italic')
-    plt.subplots_adjust(bottom=0.15)
+    plt.subplots_adjust(top=0.86, bottom=0.14)
     v2_path = os.path.join(x_out_dir, "x_community_sentiment_distributions.png")
-    plt.savefig(v2_path, dpi=300)
+    plt.savefig(v2_path, dpi=300, bbox_inches='tight')
     plt.close()
     print(f" -> Saved {v2_path}")
 
@@ -466,7 +466,7 @@ def run_sentiment_pipeline():
     # -------------------------------------------------------------------------
     r_filtered_comm = r_df[r_df['Community'].isin(comm_order)].copy()
 
-    plt.figure(figsize=(12, 6.2))
+    plt.figure(figsize=(12, 6.8))
     ax = plt.subplot(111)
     sns.boxplot(data=r_filtered_comm, x='Community', y='sentiment_compound', hue='Community', order=comm_order,
                 palette='Pastel1', ax=ax, showmeans=True, legend=False,
@@ -480,7 +480,7 @@ def run_sentiment_pipeline():
                     ha='center', va='bottom', fontsize=8.5, fontweight='semibold')
 
     plt.title('Reddit Sentiment Score Distribution Across Louvain Communities\n(N = 1,957 matched items / 95.9% coverage; 83 unclustered items excluded)\nKruskal-Wallis H = 16.82, p = 0.005 | Dunn Post-Hoc: Only C3 vs C6 differs significantly (Bonferroni p = 0.006)', 
-              fontsize=11, fontweight='bold', pad=25)
+              fontsize=11, fontweight='bold', pad=14)
     plt.xlabel('Interaction-Based Community', fontsize=11)
     plt.ylabel('VADER Compound Score', fontsize=11)
     plt.ylim(-1.15, 1.30)
@@ -488,9 +488,9 @@ def run_sentiment_pipeline():
     plt.figtext(0.5, 0.01, 
                 "Note: 1,957 of 2,040 items (95.9%) match detected network communities (C1–C6 + Other). 83 items (4.1%) are unclustered.\nHigh coverage is achieved via hierarchical comment reply trees. Red marker: mean; black line: median.",
                 ha='center', fontsize=8.5, style='italic')
-    plt.subplots_adjust(bottom=0.15)
+    plt.subplots_adjust(top=0.86, bottom=0.14)
     v3_path = os.path.join(reddit_out_dir, "reddit_community_sentiment_distributions.png")
-    plt.savefig(v3_path, dpi=300)
+    plt.savefig(v3_path, dpi=300, bbox_inches='tight')
     plt.close()
     print(f" -> Saved {v3_path}")
 
