@@ -1,0 +1,5 @@
+Platform,Comparison,Mean_JS,Shuffle_Mean_JS,Widest_Pair,Widest_JS
+X,Communities C1-C6,0.3979,0.1929,C5 vs C6,0.6606
+Reddit,Communities C1-C6,0.294,0.2175,C3 vs C6,0.4301
+X,Before vs Peak,0.1283,,Before vs Peak,0.1283
+X,Peak vs After,0.0937,,Peak vs After,0.0937
