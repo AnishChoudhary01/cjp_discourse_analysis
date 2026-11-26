@@ -1,0 +1,220 @@
+<!--
+  Landing page for the CJP–NEET discourse study.
+  States the research problem, the plan, how the dataset was collected,
+  and what the analysis found. Photographs are freely licensed shots
+  from the 2026 protests the posts describe.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CJP Discourse — the project</title>
+  <meta name="description" content="How the CJP–NEET protest was talked about on X and Reddit: the question, the plan, the dataset, and what the analysis found.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#content">Skip to content</a>
+
+  <header class="stage" id="home">
+    <img class="stage-photo" src="images/jantar-wide.jpg" alt="A night crowd at the Jantar Mantar protest in Delhi, July 2026, under trees, with a tricolour raised on the right.">
+    <div class="stage-shade" aria-hidden="true"></div>
+
+    <div class="wrap">
+      <nav class="nav" aria-label="Page">
+        <a class="logo" href="#home">CJP Discourse</a>
+        <button class="menu" type="button" aria-expanded="false" aria-controls="nav-links">Menu</button>
+        <div id="nav-links" class="links">
+          <a href="#home">Home</a>
+          <a href="#problem">Problem</a>
+          <a href="#plan">Plan</a>
+          <a href="#dataset">Dataset</a>
+          <a href="#findings">Findings</a>
+        </div>
+        <a class="dash" href="../dashboard/index.html">Dashboard</a>
+        <button class="icon-btn" id="open-search" type="button" aria-label="Search this page">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16 16.5 20 20.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </nav>
+
+      <div class="hero-copy">
+        <h1>CJP Discourse:<br>Who talks to whom</h1>
+        <p>In the summer of 2026, students filled Jantar Mantar after the NEET-UG paper leak. This project reads the public argument on X and Reddit and asks whether each platform spoke with one voice, or split into smaller rooms.</p>
+      </div>
+
+      <section class="row" aria-labelledby="featured-title">
+        <div class="row-head">
+          <h2 id="featured-title">The project</h2>
+          <div class="arrows">
+            <button class="arrow" type="button" data-scroll="featured" data-dir="-1" aria-label="Previous cards">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6.5 9 12l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button class="arrow" type="button" data-scroll="featured" data-dir="1" aria-label="Next cards">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6.5 15 12l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="track" id="featured" tabindex="0">
+          <a class="card" href="#problem">
+            <img src="images/march-01.jpg" alt="Protesters on a wet road at Jantar Mantar on 20 July 2026, with a large tricolour in the foreground.">
+            <span class="veil" aria-hidden="true"></span>
+            <span class="card-body">
+              <strong>The problem</strong>
+              <span>Is a platform one viewpoint, or a set of smaller rooms that mostly talk inward?</span>
+              <em>Read more <span aria-hidden="true">↗</span></em>
+            </span>
+          </a>
+          <a class="card" href="#plan">
+            <img src="images/march-08.jpg" alt="Protesters standing on a vehicle during the 20 July 2026 march at Jantar Mantar, one of them holding a tricolour.">
+            <span class="veil" aria-hidden="true"></span>
+            <span class="card-body">
+              <strong>The plan</strong>
+              <span>Separate what people said from who they replied to, then watch both across the march.</span>
+              <em>Read more <span aria-hidden="true">↗</span></em>
+            </span>
+          </a>
+          <a class="card" href="#dataset">
+            <img src="images/evening.jpg" alt="A dense crowd at Jantar Mantar on 21 July 2026, many people holding phones up to record.">
+            <span class="veil" aria-hidden="true"></span>
+            <span class="card-body">
+              <strong>The dataset</strong>
+              <span>Public posts from X, in three slices around the march, and the long threads on Reddit.</span>
+              <em>Read more <span aria-hidden="true">↗</span></em>
+            </span>
+          </a>
+          <a class="card" href="#findings">
+            <img src="images/bengaluru.jpg" alt="A handmade poster held up at a NEET protest in Bengaluru on 14 June 2026, with a Cockroach Janta Party tent behind the crowd.">
+            <span class="veil" aria-hidden="true"></span>
+            <span class="card-body">
+              <strong>What we found</strong>
+              <span>The rooms point inward. The smaller side still walks into the larger one.</span>
+              <em>Read more <span aria-hidden="true">↗</span></em>
+            </span>
+          </a>
+        </div>
+      </section>
+    </div>
+  </header>
+
+  <main id="content">
+    <section class="row showcase wrap" aria-labelledby="photo-title">
+      <div class="row-head">
+        <h2 id="photo-title">From the protest <span>Jantar Mantar, July 2026</span></h2>
+        <div class="arrows">
+          <button class="arrow" type="button" data-scroll="photos" data-dir="-1" aria-label="Previous photograph">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6.5 9 12l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="arrow" type="button" data-scroll="photos" data-dir="1" aria-label="Next photograph">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6.5 15 12l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="track photos" id="photos" tabindex="0">
+        <figure class="slide">
+          <img src="images/jantar-wide.jpg" alt="Night gathering at Jantar Mantar, Delhi, July 2026.">
+          <figcaption>Night at Jantar Mantar</figcaption>
+        </figure>
+        <figure class="slide">
+          <img src="images/march-01.jpg" alt="Rainy approach to the protest on 20 July 2026, tricolour in the foreground.">
+          <figcaption>20 July, before the march</figcaption>
+        </figure>
+        <figure class="slide">
+          <img src="images/march-08.jpg" alt="Protesters on a vehicle during the Jantar Mantar march on 20 July 2026.">
+          <figcaption>On the vehicle</figcaption>
+        </figure>
+        <figure class="slide">
+          <img src="images/march-22.jpg" alt="Protest banners held above a crowd under trees at Jantar Mantar on 20 July 2026.">
+          <figcaption>Banners in the crowd</figcaption>
+        </figure>
+        <figure class="slide">
+          <img src="images/evening.jpg" alt="Crowd at Jantar Mantar on 21 July 2026 recording the protest on their phones.">
+          <figcaption>21 July, phones up</figcaption>
+        </figure>
+        <figure class="slide">
+          <img src="images/bengaluru.jpg" alt="Poster at the Freedom Park protest in Bengaluru on 14 June 2026, Cockroach Janta Party tent behind.">
+          <figcaption>Bengaluru, 14 June</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <div class="study wrap">
+      <div class="split">
+        <section class="panel" id="problem" data-search="The problem">
+          <p class="kicker">The problem</p>
+          <h2>One voice, or many closed rooms?</h2>
+          <p>The case is the CJP protest after the NEET-UG 2026 paper leak, and the 20 July march from Jantar Mantar.</p>
+          <ul class="lines">
+            <li><b>Who clusters</b> Replies, mentions, and quotes.</li>
+            <li><b>Who disagrees</b> Tone, stance, and topic.</li>
+            <li><b>What hardens</b> Before the march, the peak, and after.</li>
+          </ul>
+        </section>
+
+        <section class="panel" id="plan" data-search="The plan">
+          <p class="kicker">The plan</p>
+          <h2>Score the words apart from the ties.</h2>
+          <ol class="stepper">
+            <li><span>01</span>Clean</li>
+            <li><span>02</span>Draw ties</li>
+            <li><span>03</span>Find rooms</li>
+            <li><span>04</span>Tone, then stance</li>
+            <li><span>05</span>Test the split</li>
+          </ol>
+          <p>Similar posts are not enough to call a room an echo chamber. Stance labels were checked on 180 posts: 86% accurate.</p>
+        </section>
+      </div>
+
+      <section class="panel" id="dataset" data-search="The dataset">
+        <div class="panel-top">
+          <div>
+            <p class="kicker">The dataset</p>
+            <h2>Public posts from the same weeks.</h2>
+          </div>
+          <p>X was scraped with Zeeschuimer in three passes. Reddit came from r/cockroachjantaparty and r/IndianFocus. Bots, duplicates, and off-topic rows were removed.</p>
+        </div>
+        <div class="metrics">
+          <article><b>3,447</b><span>X tweets kept</span><small>from 4,909 collected</small></article>
+          <article><b>2,040</b><span>Reddit items kept</span><small>149 posts, 1,891 comments</small></article>
+          <article><b>1,517</b><span>accounts on X</span><small>1,722 mention ties</small></article>
+          <article><b>1,109</b><span>accounts on Reddit</span><small>1,560 reply ties</small></article>
+        </div>
+        <div class="phases">
+          <article><span>Before</span><strong>7 Jun – 19 Jul</strong><p>19 posts a day</p></article>
+          <article><span>After</span><strong>20 – 24 Jul</strong><p>188 a day, 459 on the 24th</p></article>
+          <article><span>After</span><strong>25 – 30 Jul</strong><p>136 posts a day</p></article>
+        </div>
+      </section>
+
+      <section id="findings" data-search="What we found">
+        <div class="row-head">
+          <h2>What we found</h2>
+        </div>
+        <div class="stats">
+          <article><b>−0.75</b><span>Ties point inward on X. Reddit is −0.94. On X it tightens from −0.68 to −0.79.</span></article>
+          <article><b>64%</b><span>of Anti-CJP ties on X still reach Pro-CJP users. 70% do on Reddit.</span></article>
+          <article><b>0.05</b><span>Controversy on X. Reddit is 0.03. A sealed split would be near 1. Peak on X is 0.14.</span></article>
+          <article><b>3 : 1</b><span>Pro-CJP throughout. Anger is the tone of the protest, not a vote against it.</span></article>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!--
+    Photo credit, kept off the page: night and 21 July crowds by Alnitak-Alnilam-Mintaka,
+    20 July march by Sumita Roy Dutta (CC BY-SA 4.0); Bengaluru, 14 June, by Subin Siby (CC0).
+  -->
+
+  <dialog id="search" aria-labelledby="search-title">
+    <form method="dialog">
+      <h2 id="search-title">Search this page</h2>
+      <input id="search-input" type="search" placeholder="Problem, plan, dataset, march…" autocomplete="off">
+    </form>
+    <ul id="search-hits"></ul>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
