@@ -1,5 +1,6 @@
 # CJP Online Discourse Analysis
 
+
 ## Overview
 
 This project investigates **echo chambers, structural homophily, and opinion polarization** in online discourse.
@@ -56,6 +57,14 @@ flowchart TD
     subgraph S9["09 Cross-Platform Dynamics"]
         H --> I["Cross-Platform Stance Mixing & Comparisons<br/>(09_cross_platform/)"]
     end
+
+    subgraph S10["10 Random Walk Controversy"]
+        I --> J["Garimella RWC Scores<br/>(10_random_walk_controversy/)"]
+    end
+
+    subgraph S11["11 Topic Modeling"]
+        J --> K["11 Semantic Themes & JS Divergence<br/>(11_topic_modeling/)"]
+    end
 ```
 
 ### Network & Community Analysis
@@ -93,6 +102,14 @@ X discourse is examined across three periods:
 
 This allows changes in interaction, stance, and network structure to be examined over time.
 
+### Random Walk Controversy (RWC)
+
+Using Garimella et al.'s random-walk controversy metric on the largest connected components ($916$ nodes on X, $1,086$ on Reddit), the full-period controversy score is **$0.0460$ on X** and **$0.0313$ on Reddit**, peaking at **$0.1390$** during the X Peak phase (where a sealed echo chamber would approach $1.0$).
+
+### Topic Modeling & Jensen-Shannon Divergence
+
+Posts are clustered into **11 semantic themes** (led by *Street protest* at $2,572$ posts and *Hashtag campaign* at $382$ posts). Pairwise community topic distances yield a mean Jensen-Shannon distance of **$0.3979$ on X** (vs. $0.1929$ shuffle; widest pair `C5` vs. `C6` at $0.6606$) and **$0.2940$ on Reddit** (vs. $0.2175$ shuffle).
+
 ---
 
 ## Repository Structure
@@ -115,7 +132,9 @@ csma_prj/
 │   ├── sentiment_analysis.py                  # VADER valence sentiment scoring & Dunn post-hoc statistics
 │   ├── stance_analysis.py                     # Target-specific stance classification & contingency analysis
 │   ├── validate_stance_classifier.py          # Independent stratified manual validation
-│   └── polarization_metrics.py                # Krackhardt E-I Index, stance mixing matrices & temporal trajectory
+│   ├── polarization_metrics.py                # Krackhardt E-I Index, stance mixing matrices & temporal trajectory
+│   ├── random_walk_controversy.py             # Garimella RWC scores across graphs & X phases
+│   └── topic_modeling.py                      # Semantic topic clustering & Jensen-Shannon distances
 │
 ├── output/                                    # Generated Artifacts organized by analysis stage
 │   ├── 01_preprocessing/                      # Cleaned posts, comments, tweets (Reddit / X)
@@ -126,7 +145,13 @@ csma_prj/
 │   ├── 06_stance_analysis/                    # 3-class target stance predictions, phase summaries & plots
 │   ├── 07_stance_validation/                  # Stratified manual validation sample (N=180), metrics & confusion matrix
 │   ├── 08_polarization/                       # Krackhardt E-I index tables & temporal trajectories (X / Reddit)
-│   └── 09_cross_platform/                     # Cross-platform comparisons, heatmaps & stance mixing matrices
+│   ├── 09_cross_platform/                     # Cross-platform comparisons, heatmaps & stance mixing matrices
+│   ├── 10_random_walk_controversy/            # RWC scores & crossing probability tables
+│   └── 11_topic_modeling/                     # Topic labels, community/phase topic shares & JS distances
+│
+├── landing/                                   # Static project landing page & licensed protest photos
+├── dashboard/                                 # Interactive 11-stage research dashboard
+├── index.html                                 # Root redirect to landing/index.html
 │
 ├── docs/                                      # Project Documentation & Reports
 │   ├── BRIEF_PROGRESS_REPORT.md               # Mid-Term Evaluation Progress Report
@@ -169,4 +194,10 @@ python scripts/validate_stance_classifier.py
 
 # Krackhardt E-I Index & Polarization Analysis
 python scripts/polarization_metrics.py
+
+# Random Walk Controversy (RWC)
+python scripts/random_walk_controversy.py
+
+# Topic Modeling & Jensen-Shannon Divergence
+python scripts/topic_modeling.py
 ```
