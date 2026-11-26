@@ -1,0 +1,26 @@
+# Exclude raw datasets, scripts, docs, presentations, and large analytical CSVs from Vercel static deploy
+dataset/
+scripts/
+docs/
+flowchart/
+*.pptx
+*.py
+*.md
+.git/
+
+# Exclude all output files except the 3 assets loaded by dashboard/app.js
+output/01_preprocessing/
+output/02_eda/
+output/03_network_analysis/x/
+output/03_network_analysis/reddit/*.csv
+output/04_community_detection/reddit/*.csv
+output/04_community_detection/reddit/*.png
+output/04_community_detection/x/*.csv
+output/04_community_detection/x/*.png
+output/05_sentiment_analysis/
+output/06_stance_analysis/
+output/07_stance_validation/
+output/08_polarization/
+output/09_cross_platform/
+output/10_random_walk_controversy/
+output/11_topic_modeling/

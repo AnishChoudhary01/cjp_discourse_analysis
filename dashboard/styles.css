@@ -248,6 +248,9 @@ main {
   min-width: 0;
   padding: 20px 24px 32px;
   overflow: auto;
+  background:
+    linear-gradient(180deg, rgba(14, 24, 16, 0.52) 0%, rgba(12, 18, 13, 0.65) 100%),
+    url("../landing/images/jantar-wide.jpg") center / cover fixed no-repeat;
 }
 
 .top {
@@ -257,7 +260,16 @@ main {
   gap: 16px;
   margin-bottom: 18px;
   padding-bottom: 14px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.top .eyebrow {
+  margin: 0 0 3px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .eyebrow {
@@ -274,6 +286,7 @@ h1 {
   font-size: 26px;
   letter-spacing: -0.035em;
   font-weight: 800;
+  color: #ffffff;
 }
 
 h2 {
