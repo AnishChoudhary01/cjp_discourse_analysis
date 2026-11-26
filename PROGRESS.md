@@ -13,7 +13,7 @@ Steps 1–9 were already in the repository. This file records steps 10 and 11, w
 | 1–7 | Cleaned data, EDA, interaction graphs, Louvain communities, VADER sentiment, stance labels, and the 180-item stance check | `output/01_preprocessing/` through `output/07_stance_validation/` |
 | 8 | E-I index. Communities point inward. On X the network gets more inward from Before to After. | `output/08_polarization/` |
 | 9 | Cross-stance mixing. Pro-CJP users mostly talk to Pro-CJP users. Anti-CJP users mostly reach Pro-CJP users, on both platforms. | `output/09_cross_platform/` |
-| 10 | Random walk controversy. A walker who starts on one stance side usually can reach the other. The score is about 0.03 on X and on Reddit. A sealed split would be near 1. Peak on X is the most separated moment, at 0.11. | `scripts/random_walk_controversy.py`, `output/10_random_walk_controversy/` |
+| 10 | Random walk controversy. A walker who starts on one stance side usually can reach the other. The full-period score is 0.05 on X and 0.03 on Reddit. A sealed split would be near 1. Peak on X is the most separated moment, at 0.14. | `scripts/random_walk_controversy.py`, `output/10_random_walk_controversy/` |
 | 11 | Themes. Both platforms are mostly the Jantar Mantar street protest. On X, C5 is the hashtag campaign (56%) and C6 is the street protest (52%). Reddit communities are closer to each other. The theme barely changes from Before to After. | `scripts/topic_modeling.py`, `output/11_topic_modeling/` |
 
 Step 10 was committed at 2:00 AM IST on 24 November 2026. Step 11 was committed at 3:00 AM IST the same day.

@@ -35,14 +35,27 @@ def calculate_bimodality_coefficient(series):
     if n < 4:
         return np.nan
     skew = stats.skew(data)
-    # Pearson kurtosis (normal distribution = 3)
-    kurt = stats.kurtosis(data, fisher=False)
+    # Excess kurtosis (normal distribution = 0). The sample-size term below
+    # already supplies the 3 that a normal distribution contributes.
+    kurt = stats.kurtosis(data, fisher=True)
     numerator = (skew ** 2) + 1
     sample_factor = (3 * (n - 1) ** 2) / ((n - 2) * (n - 3))
     denominator = kurt + sample_factor
     if denominator == 0:
         return np.nan
     return float(numerator / denominator)
+
+def bimodality_clause(x_bc, reddit_bc):
+    """Chart and log sentence for Sarle's coefficient. A low score is not proof of one peak."""
+    if x_bc < 0.555 and reddit_bc < 0.555:
+        return (
+            f"BC: X = {x_bc:.3f}, Reddit = {reddit_bc:.3f}; "
+            "no strong evidence of bimodality under BC < 0.555 criterion"
+        )
+    return (
+        f"BC: X = {x_bc:.3f}, Reddit = {reddit_bc:.3f}; "
+        "at least one platform meets the BC > 0.555 criterion for possible bimodality"
+    )
 
 def categorize_sentiment(compound):
     """Standard VADER threshold categorization for emotional valence."""
@@ -289,8 +302,8 @@ def run_sentiment_pipeline():
 
     print("\n--- Overall Platform Sentiment Summary ---")
     print(cross_platform_df[['Platform', 'Total_Items', 'Mean_Compound', 'Median_Compound', 'Negative_Pct', 'Neutral_Pct', 'Positive_Pct', 'Bimodality_Coefficient_BC', 'Cliffs_Delta']].to_string(index=False))
-    print("\n[Bimodality Check]: Sarle's Bimodality Coefficient is BC = 0.2599 for X and BC = 0.1911 for Reddit.")
-    print(" -> Assessment: The distributions do not provide strong evidence of bimodality under the chosen BC criterion (BC < 0.555).")
+    print(f"\n[Bimodality Check]: Sarle's Bimodality Coefficient is BC = {x_stats['Bimodality_Coefficient_BC']:.4f} for X and BC = {reddit_stats['Bimodality_Coefficient_BC']:.4f} for Reddit.")
+    print(f" -> Assessment: {bimodality_clause(x_stats['Bimodality_Coefficient_BC'], reddit_stats['Bimodality_Coefficient_BC'])}")
     print("    (Note: This does not prove unimodality or a 'shared grievance'; it indicates absence of bimodal polarization under BC).")
 
     # -------------------------------------------------------------------------
@@ -392,38 +405,8 @@ def run_sentiment_pipeline():
     # -------------------------------------------------------------------------
     # Plot 1: Overall Sentiment Comparison (X vs Reddit)
     # -------------------------------------------------------------------------
-    fig, axes = plt.subplots(1, 2, figsize=(14, 5.5))
-
-    # Subplot A: Continuous Density Distributions (KDE)
-    sns.kdeplot(ax=axes[0], data=x_df['sentiment_compound'], label=f"X (N={len(x_df):,})", color='#1DA1F2', lw=2.2, fill=True, alpha=0.15)
-    sns.kdeplot(ax=axes[0], data=r_df['sentiment_compound'], label=f"Reddit (N={len(r_df):,})", color='#FF4500', lw=2.2, fill=True, alpha=0.15)
-    axes[0].set_title('Kernel Density of Compound Sentiment Scores', fontweight='bold', fontsize=12)
-    axes[0].set_xlabel('VADER Compound Score (-1.0 = Negative, +1.0 = Positive)', fontsize=11)
-    axes[0].set_ylabel('Density', fontsize=11)
-    axes[0].axvline(0, color='gray', linestyle='--', alpha=0.6)
-    axes[0].legend(frameon=True, fontsize=10)
-
-    # Subplot B: Categorical Sentiment Proportion
-    cat_comp = pd.DataFrame({
-        'Negative': [x_stats['Negative_Pct'], reddit_stats['Negative_Pct']],
-        'Neutral': [x_stats['Neutral_Pct'], reddit_stats['Neutral_Pct']],
-        'Positive': [x_stats['Positive_Pct'], reddit_stats['Positive_Pct']],
-    }, index=['X (Twitter)', 'Reddit'])
-
-    cat_comp.plot(kind='bar', stacked=True, ax=axes[1], color=['#D95F02', '#7570B3', '#1B9E77'], edgecolor='white', width=0.55)
-    axes[1].set_title('Proportion of Sentiment Categories', fontweight='bold', fontsize=12)
-    axes[1].set_xlabel('Platform', fontsize=11)
-    axes[1].set_ylabel('Percentage (%)', fontsize=11)
-    axes[1].set_ylim(0, 100)
-    plt.setp(axes[1].get_xticklabels(), rotation=0)
-    axes[1].legend(title='Category', loc='lower right', frameon=True)
-
-    fig.suptitle(f"Cross-Platform Sentiment Comparison: X (Twitter) vs. Reddit\nMann-Whitney U = {mwu_stat:.2e}, p = {mwu_pval:.2e} | Cliff's Delta = {cliffs_d:.3f} (Medium Effect Size)\n[BC: X = {x_stats['Bimodality_Coefficient_BC']:.3f}, Reddit = {reddit_stats['Bimodality_Coefficient_BC']:.3f}; no strong evidence of bimodality under BC < 0.555 criterion]",
-                 fontsize=11.5, fontweight='bold', y=0.98)
-    plt.tight_layout()
     v1_path = os.path.join(cross_out_dir, "overall_sentiment_comparison_x_reddit.png")
-    plt.savefig(v1_path, dpi=300)
-    plt.close()
+    save_platform_sentiment_chart(x_df, r_df, x_stats, reddit_stats, mwu_stat, mwu_pval, cliffs_d, v1_path)
     print(f" -> Saved {v1_path}")
 
     # -------------------------------------------------------------------------
@@ -532,14 +515,107 @@ def run_sentiment_pipeline():
     print("=======================================================================")
     print("Summary of Corrections Applied:")
     print(" 1. Explicitly reported community match coverage (X: 57.9%, Reddit: 95.9%).")
-    print(" 2. Reframed BC interpretation: Distributions do not provide strong evidence of")
-    print("    bimodality under BC < 0.555 criterion (no claim of unimodality or shared grievance).")
+    print(f" 2. Bimodality: {bimodality_clause(x_stats['Bimodality_Coefficient_BC'], reddit_stats['Bimodality_Coefficient_BC'])}")
+    print("    This does not prove unimodality or a shared grievance.")
     print(" 3. Replaced 'profound' with empirical effect sizes for Mann-Whitney U")
     print(f"    (Cliff's Delta = {cliffs_d:.4f}, Rank-Biserial r_rb = {r_rb:.4f}).")
     print(" 4. Executed Dunn's post-hoc pairwise tests with Bonferroni correction for C1-C6.")
     print(" 5. Strictly maintained separation between emotional valence and CJP stance.")
     print(" 6. Withheld claims of echo chambers or polarization pending E-I index integration.")
     print("=======================================================================")
+
+def save_platform_sentiment_chart(x_df, r_df, x_stats, reddit_stats, mwu_stat, mwu_pval, cliffs_d, out_path):
+    """Redraw the X-versus-Reddit sentiment figure, including the bimodality line."""
+    sns.set_theme(style="whitegrid")
+    plt.rcParams["font.sans-serif"] = "DejaVu Sans"
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5.5))
+    sns.kdeplot(ax=axes[0], data=x_df["sentiment_compound"], label=f"X (N={len(x_df):,})", color="#1DA1F2", lw=2.2, fill=True, alpha=0.15)
+    sns.kdeplot(ax=axes[0], data=r_df["sentiment_compound"], label=f"Reddit (N={len(r_df):,})", color="#FF4500", lw=2.2, fill=True, alpha=0.15)
+    axes[0].set_title("Kernel Density of Compound Sentiment Scores", fontweight="bold", fontsize=12)
+    axes[0].set_xlabel("VADER Compound Score (-1.0 = Negative, +1.0 = Positive)", fontsize=11)
+    axes[0].set_ylabel("Density", fontsize=11)
+    axes[0].axvline(0, color="gray", linestyle="--", alpha=0.6)
+    axes[0].legend(frameon=True, fontsize=10)
+
+    cat_comp = pd.DataFrame({
+        "Negative": [x_stats["Negative_Pct"], reddit_stats["Negative_Pct"]],
+        "Neutral": [x_stats["Neutral_Pct"], reddit_stats["Neutral_Pct"]],
+        "Positive": [x_stats["Positive_Pct"], reddit_stats["Positive_Pct"]],
+    }, index=["X (Twitter)", "Reddit"])
+    cat_comp.plot(kind="bar", stacked=True, ax=axes[1], color=["#D95F02", "#7570B3", "#1B9E77"], edgecolor="white", width=0.55)
+    axes[1].set_title("Proportion of Sentiment Categories", fontweight="bold", fontsize=12)
+    axes[1].set_xlabel("Platform", fontsize=11)
+    axes[1].set_ylabel("Percentage (%)", fontsize=11)
+    axes[1].set_ylim(0, 100)
+    plt.setp(axes[1].get_xticklabels(), rotation=0)
+    axes[1].legend(title="Category", loc="lower right", frameon=True)
+
+    fig.suptitle(
+        f"Cross-Platform Sentiment Comparison: X (Twitter) vs. Reddit\n"
+        f"Mann-Whitney U = {mwu_stat:.2e}, p = {mwu_pval:.2e} | Cliff's Delta = {cliffs_d:.3f} (Medium Effect Size)\n"
+        f"[{bimodality_clause(x_stats['Bimodality_Coefficient_BC'], reddit_stats['Bimodality_Coefficient_BC'])}]",
+        fontsize=11.5, fontweight="bold", y=0.98,
+    )
+    plt.tight_layout()
+    fig.savefig(out_path, dpi=300)
+    plt.close(fig)
+
+
+def _community_bimodality(items_df):
+    """Sarle BC for each community already stored on the saved sentiment file."""
+    scores = {}
+    for community, group in items_df.groupby("Community"):
+        coefficient = calculate_bimodality_coefficient(group["sentiment_compound"])
+        scores[community] = round(float(coefficient), 4) if pd.notna(coefficient) else np.nan
+    return scores
+
+
+def refresh_saved_bimodality(base_dir=None):
+    """
+    Recompute Sarle's coefficient from the saved VADER scores.
+
+    Tweet text is not scored again, and the stance labels are left as they are.
+    """
+    base_dir = base_dir or r"c:\Users\Palak\Documents\csma_prj"
+    x_items = pd.read_csv(
+        os.path.join(base_dir, "output", "05_sentiment_analysis", "x", "x_tweets_with_sentiment.csv"),
+        usecols=["sentiment_compound", "Community"],
+    )
+    r_items = pd.read_csv(
+        os.path.join(base_dir, "output", "05_sentiment_analysis", "reddit", "reddit_items_with_sentiment.csv"),
+        usecols=["sentiment_compound", "Community"],
+    )
+
+    for summary_path, items in (
+        (os.path.join(base_dir, "output", "05_sentiment_analysis", "x", "x_community_sentiment_summary.csv"), x_items),
+        (os.path.join(base_dir, "output", "05_sentiment_analysis", "reddit", "reddit_community_sentiment_summary.csv"), r_items),
+    ):
+        summary = pd.read_csv(summary_path)
+        coefficients = _community_bimodality(items)
+        summary["Bimodality_BC"] = summary["Community"].map(coefficients)
+        summary.to_csv(summary_path, index=False, encoding="utf-8")
+
+    cross_path = os.path.join(base_dir, "output", "09_cross_platform", "cross_platform_sentiment_comparison.csv")
+    cross = pd.read_csv(cross_path)
+    x_bc = round(float(calculate_bimodality_coefficient(x_items["sentiment_compound"])), 4)
+    reddit_bc = round(float(calculate_bimodality_coefficient(r_items["sentiment_compound"])), 4)
+    cross.loc[cross["Platform"] == "X (Twitter)", "Bimodality_Coefficient_BC"] = x_bc
+    cross.loc[cross["Platform"] == "Reddit", "Bimodality_Coefficient_BC"] = reddit_bc
+    cross.to_csv(cross_path, index=False, encoding="utf-8")
+
+    x_stats = cross.loc[cross["Platform"] == "X (Twitter)"].iloc[0]
+    reddit_stats = cross.loc[cross["Platform"] == "Reddit"].iloc[0]
+    chart_path = os.path.join(base_dir, "output", "09_cross_platform", "overall_sentiment_comparison_x_reddit.png")
+    save_platform_sentiment_chart(
+        x_items, r_items, x_stats, reddit_stats,
+        float(x_stats["MW_U_Statistic"]), float(x_stats["MW_p_value"]), float(x_stats["Cliffs_Delta"]),
+        chart_path,
+    )
+    print(f"X BC = {x_bc:.4f}; Reddit BC = {reddit_bc:.4f}")
+    print(bimodality_clause(x_bc, reddit_bc))
+    print(f"Saved {cross_path}")
+    print(f"Saved {chart_path}")
+
 
 if __name__ == "__main__":
     run_sentiment_pipeline()

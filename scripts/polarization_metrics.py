@@ -65,6 +65,7 @@ def run_polarization_analysis():
     
     x_nodes_path = os.path.join(base_dir, "output", "04_community_detection", "x", "x_nodes_with_communities.csv")
     x_edges_path = os.path.join(base_dir, "output", "03_network_analysis", "x", "x_edges.csv")
+    x_phase_edges_path = os.path.join(base_dir, "output", "03_network_analysis", "x", "x_edges_by_phase.csv")
     x_tweets_path = os.path.join(base_dir, "output", "06_stance_analysis", "x", "x_tweets_with_stance.csv")
     
     r_nodes_path = os.path.join(base_dir, "output", "04_community_detection", "reddit", "reddit_nodes_with_communities.csv")
@@ -90,6 +91,7 @@ def run_polarization_analysis():
     print("[Step 1] Loading existing network topologies and community assignments...")
     x_nodes = pd.read_csv(x_nodes_path)
     x_edges = pd.read_csv(x_edges_path)
+    x_phase_edges = pd.read_csv(x_phase_edges_path)
     r_nodes = pd.read_csv(r_nodes_path)
     r_edges = pd.read_csv(r_edges_path)
 
@@ -261,7 +263,7 @@ def run_polarization_analysis():
     temporal_records = []
 
     for p in phases:
-        sub_edges = x_edges[x_edges['PrimaryPhase'] == p]
+        sub_edges = x_phase_edges[x_phase_edges['Phase'].astype(str).str.strip() == p]
         sub_comm_ei, sub_net_ei, sub_i_net, sub_e_net, sub_tot_net = calculate_community_ei(sub_edges, x_comm_map, comm_order)
         
         # Stance mixing in this phase
@@ -320,8 +322,9 @@ def run_polarization_analysis():
     ax.legend(loc='lower left', frameon=True, fontsize=10)
     
     # Annotate specific notable communities
-    ax.annotate('C3 on X: Highest Boundary Crossing (EI = -0.01)',
-                xy=(2 - bar_width/2, -0.01), xytext=(1.2, 0.08),
+    c3_ei = float(x_comm_ei.loc[x_comm_ei['Community'] == 'C3', 'EI_Index'].iloc[0])
+    ax.annotate(f'C3 on X: Highest Boundary Crossing (EI = {c3_ei:.2f})',
+                xy=(2 - bar_width/2, c3_ei), xytext=(1.2, 0.08),
                 arrowprops=dict(facecolor='black', arrowstyle='->', lw=1.2),
                 fontsize=9.5, fontweight='bold', bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="#1F77B4", lw=1.2))
 
@@ -337,14 +340,16 @@ def run_polarization_analysis():
     sns.heatmap(x_stance_pct.loc[['Pro-CJP', 'Anti-CJP'], ['Pro-CJP', 'Anti-CJP']],
                 annot=True, fmt='.1f', cmap='YlOrRd', ax=axes[0], cbar=False,
                 annot_kws={"fontsize": 12, "fontweight": "bold"})
-    axes[0].set_title("X (Twitter): Outgoing Ties by Stance (%)\n(Anti-CJP directs 64.4% of ties to Pro-CJP)", fontweight='bold', fontsize=11)
+    x_anti_to_pro = x_stance_pct.loc['Anti-CJP', 'Pro-CJP']
+    axes[0].set_title(f"X (Twitter): Outgoing Ties by Stance (%)\n(Anti-CJP directs {x_anti_to_pro:.1f}% of ties to Pro-CJP)", fontweight='bold', fontsize=11)
     axes[0].set_xlabel("Target Stance", fontsize=10, fontweight='semibold')
     axes[0].set_ylabel("Source Stance", fontsize=10, fontweight='semibold')
 
     sns.heatmap(r_stance_pct.loc[['Pro-CJP', 'Anti-CJP'], ['Pro-CJP', 'Anti-CJP']],
                 annot=True, fmt='.1f', cmap='Blues', ax=axes[1], cbar=False,
                 annot_kws={"fontsize": 12, "fontweight": "bold"})
-    axes[1].set_title("Reddit: Outgoing Ties by Stance (%)\n(Anti-CJP directs 70.3% of ties to Pro-CJP)", fontweight='bold', fontsize=11)
+    r_anti_to_pro = r_stance_pct.loc['Anti-CJP', 'Pro-CJP']
+    axes[1].set_title(f"Reddit: Outgoing Ties by Stance (%)\n(Anti-CJP directs {r_anti_to_pro:.1f}% of ties to Pro-CJP)", fontweight='bold', fontsize=11)
     axes[1].set_xlabel("Target Stance", fontsize=10, fontweight='semibold')
     axes[1].set_ylabel("Source Stance", fontsize=10, fontweight='semibold')
 
@@ -379,7 +384,7 @@ def run_polarization_analysis():
     
     # Text box explaining focal community selection neutrally
     ax1.text(0.03, 0.94,
-             "Focal Community Selection:\n• C1: Largest structural interaction community\n• C3: Community with highest boundary crossing (EI = -0.01)",
+             f"Focal Community Selection:\n• C1: Largest structural interaction community\n• C3: Community with highest boundary crossing (EI = {c3_ei:.2f})",
              transform=ax1.transAxes, verticalalignment='top',
              bbox=dict(boxstyle='round,pad=0.4', facecolor='white', alpha=0.9, edgecolor='gray'),
              fontsize=9)
@@ -396,10 +401,14 @@ def run_polarization_analysis():
     print("Key Analytical Findings:")
     print(f" 1. Community-Level E-I: Louvain communities show inward structural concentration")
     print(f"    (Reddit Network EI = {r_net_ei:.4f}; X Network EI = {x_net_ei:.4f}).")
-    print(f"    Exception: C3 on X exhibits high cross-community bridging (EI = -0.0097).")
+    print(f"    Exception: C3 on X exhibits high cross-community bridging (EI = {c3_ei:.4f}).")
     print(f" 2. Cross-Stance Engagement Shows Substantial Boundary Crossing:")
-    print(f"    Anti-CJP participants direct {x_stance_pct.loc['Anti-CJP', 'Pro-CJP']:.1f}% of all outgoing ties on X (72.1% between Pro/Anti)")
-    print(f"    and {r_stance_pct.loc['Anti-CJP', 'Pro-CJP']:.1f}% on Reddit (70.4% between Pro/Anti) TOWARD Pro-CJP targets.")
+    x_anti_pair = x_stance_mat.loc['Anti-CJP', ['Pro-CJP', 'Anti-CJP']].sum()
+    r_anti_pair = r_stance_mat.loc['Anti-CJP', ['Pro-CJP', 'Anti-CJP']].sum()
+    x_anti_pair_pct = 100.0 * x_stance_mat.loc['Anti-CJP', 'Pro-CJP'] / x_anti_pair
+    r_anti_pair_pct = 100.0 * r_stance_mat.loc['Anti-CJP', 'Pro-CJP'] / r_anti_pair
+    print(f"    Anti-CJP participants direct {x_stance_pct.loc['Anti-CJP', 'Pro-CJP']:.1f}% of known-stance ties on X ({x_anti_pair_pct:.1f}% of ties that stay between Pro and Anti)")
+    print(f"    and {r_stance_pct.loc['Anti-CJP', 'Pro-CJP']:.1f}% on Reddit ({r_anti_pair_pct:.1f}% of ties that stay between Pro and Anti) toward Pro-CJP targets.")
     print(f"    This demonstrates substantial cross-stance engagement rather than complete ideological isolation,")
     print(f"    though it does not eliminate structural homophily within the network.")
     print(f" 3. Temporal Trajectory: Network-level E-I became progressively more negative")

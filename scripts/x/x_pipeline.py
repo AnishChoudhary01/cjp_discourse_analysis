@@ -10,6 +10,132 @@ import seaborn as sns
 # Ensure UTF-8 output on Windows terminal
 sys.stdout.reconfigure(encoding='utf-8')
 
+def _account_handle(value):
+    """Lowercase account handle. Blank means the field has no real account."""
+    if pd.isna(value):
+        return ""
+    handle = str(value).strip().lstrip("@").lower()
+    if handle in {"", "none", "nan"}:
+        return ""
+    return handle
+
+
+def _interaction_types(values):
+    """Stable list of interaction kinds on one edge."""
+    return ",".join(sorted(set(values)))
+
+
+def extract_x_edges(clean_x):
+    """
+    Build directed X interactions from replies, quotes, and mentions.
+
+    A mention of the account already used as the reply or quote target on that
+    same tweet is not counted again. The all-period table keeps one row per
+    account pair. The phase table keeps one row per account pair per phase,
+    which is what the phase E-I and phase controversy scores must use.
+    """
+    edges = []
+
+    replies_df = clean_x[clean_x["is_reply"] == "yes"][["author", "replied_author", "protest_phase"]].dropna()
+    for _, row in replies_df.iterrows():
+        src = _account_handle(row["author"])
+        tgt = _account_handle(row["replied_author"])
+        if src and tgt and src != tgt:
+            edges.append({"Source": src, "Target": tgt, "InteractionType": "reply", "Phase": row["protest_phase"]})
+
+    quotes_df = clean_x[clean_x["is_quote_tweet"] == "yes"][["author", "quote_author", "protest_phase"]].dropna()
+    for _, row in quotes_df.iterrows():
+        src = _account_handle(row["author"])
+        tgt = _account_handle(row["quote_author"])
+        if src and tgt and src != tgt:
+            edges.append({"Source": src, "Target": tgt, "InteractionType": "quote", "Phase": row["protest_phase"]})
+
+    mention_columns = ["author", "mentions", "protest_phase", "is_reply", "replied_author", "is_quote_tweet", "quote_author"]
+    mentions_df = clean_x.loc[clean_x["mentions"].notna(), mention_columns]
+    for _, row in mentions_df.iterrows():
+        src = _account_handle(row["author"])
+        already_counted = set()
+        if row["is_reply"] == "yes":
+            replied = _account_handle(row["replied_author"])
+            if replied:
+                already_counted.add(replied)
+        if row["is_quote_tweet"] == "yes":
+            quoted = _account_handle(row["quote_author"])
+            if quoted:
+                already_counted.add(quoted)
+        mention_list = [_account_handle(token) for token in re.split(r"[,;\s]+", str(row["mentions"])) if str(token).strip()]
+        for tgt in mention_list:
+            if not src or not tgt or src == tgt or tgt in already_counted:
+                continue
+            edges.append({"Source": src, "Target": tgt, "InteractionType": "mention", "Phase": row["protest_phase"]})
+
+    edge_df = pd.DataFrame(edges)
+    if edge_df.empty:
+        raise RuntimeError("No X interaction edges were extracted from the cleaned tweets.")
+
+    agg_edges = edge_df.groupby(["Source", "Target"], as_index=False).agg(
+        Weight=("InteractionType", "count"),
+        InteractionTypes=("InteractionType", _interaction_types),
+        PrimaryPhase=("Phase", lambda phases: phases.mode().iloc[0] if not phases.empty else "Unknown"),
+    )
+    agg_edges["Type"] = "Directed"
+
+    phase_edges = edge_df.groupby(["Source", "Target", "Phase"], as_index=False).agg(
+        Weight=("InteractionType", "count"),
+        InteractionTypes=("InteractionType", _interaction_types),
+    )
+    phase_edges["Type"] = "Directed"
+
+    if int(agg_edges["Weight"].sum()) != int(phase_edges["Weight"].sum()):
+        raise RuntimeError("All-period edge weight does not match the phase edge table.")
+
+    return edge_df, agg_edges, phase_edges
+
+
+def export_x_network(clean_x, out_network, write_nodes=True):
+    """Write the all-period edges and the phase edges. Node export stays optional."""
+    edge_df, agg_edges, phase_edges = extract_x_edges(clean_x)
+    print(f" -> Raw interaction edges extracted: {len(edge_df)}")
+
+    os.makedirs(out_network, exist_ok=True)
+    edges_path = os.path.join(out_network, "x_edges.csv")
+    phase_path = os.path.join(out_network, "x_edges_by_phase.csv")
+    agg_edges.to_csv(edges_path, index=False, encoding="utf-8")
+    phase_edges.to_csv(phase_path, index=False, encoding="utf-8")
+    print(f" -> Exported Network: {agg_edges['Source'].nunique()} source accounts, {len(agg_edges)} weighted directed edges.")
+    print(f"    - Edges file: {edges_path}")
+    print(f"    - Phase edges file: {phase_path} ({len(phase_edges)} rows)")
+
+    nodes_df = None
+    if write_nodes:
+        all_users = set(agg_edges["Source"]).union(set(agg_edges["Target"]))
+        nodes_df = pd.DataFrame({"Id": list(all_users), "Label": list(all_users)})
+        author_meta = clean_x.groupby("author").agg(
+            followers=("author_followers", lambda x: pd.to_numeric(x, errors="coerce").max()),
+            verified=("verified", lambda x: any(str(v).lower() == "true" for v in x)),
+            total_tweets=("id", "count"),
+        ).reset_index()
+        nodes_df = pd.merge(nodes_df, author_meta, left_on="Id", right_on="author", how="left")
+        nodes_df["followers"] = nodes_df["followers"].fillna(0).astype(int)
+        nodes_df["verified"] = nodes_df["verified"].fillna(False).astype(bool)
+        nodes_df["total_tweets"] = nodes_df["total_tweets"].fillna(0).astype(int)
+        nodes_df.drop(columns=["author"], inplace=True, errors="ignore")
+        nodes_path = os.path.join(out_network, "x_nodes.csv")
+        nodes_df.to_csv(nodes_path, index=False, encoding="utf-8")
+        print(f"    - Nodes file: {nodes_path}")
+
+    return agg_edges, nodes_df
+
+
+def rebuild_saved_x_edges(base_dir=None):
+    """Rebuild both edge tables from the saved cleaned tweets. Does not reload the raw scrape."""
+    base_dir = base_dir or r"c:\Users\Palak\Documents\csma_prj"
+    clean_path = os.path.join(base_dir, "output", "01_preprocessing", "x", "processed_x_tweets.csv")
+    out_network = os.path.join(base_dir, "output", "03_network_analysis", "x")
+    clean_x = pd.read_csv(clean_path)
+    return export_x_network(clean_x, out_network, write_nodes=False)
+
+
 def main():
     base_dir = r"c:\Users\Palak\Documents\csma_prj"
     dataset_x_dir = os.path.join(base_dir, "dataset", "x")
@@ -268,71 +394,7 @@ def main():
     # Phase 3: Interaction Network Construction (Fix #8: Normalized handles in network)
     # -------------------------------------------------------------------------
     print("\n[Phase 3] Constructing Multi-Layer Directed Interaction Network...")
-    edges = []
-
-    # 1. Replies: author -> replied_author
-    replies_df = clean_x[clean_x['is_reply'] == 'yes'][['author', 'replied_author', 'protest_phase']].dropna()
-    for _, row in replies_df.iterrows():
-        src = str(row['author']).strip().lstrip('@').lower()
-        tgt = str(row['replied_author']).strip().lstrip('@').lower()
-        if src and tgt and src != tgt and tgt != 'none':
-            edges.append({'Source': src, 'Target': tgt, 'InteractionType': 'reply', 'Phase': row['protest_phase']})
-
-    # 2. Quotes: author -> quote_author
-    quotes_df = clean_x[clean_x['is_quote_tweet'] == 'yes'][['author', 'quote_author', 'protest_phase']].dropna()
-    for _, row in quotes_df.iterrows():
-        src = str(row['author']).strip().lstrip('@').lower()
-        tgt = str(row['quote_author']).strip().lstrip('@').lower()
-        if src and tgt and src != tgt and tgt != 'none':
-            edges.append({'Source': src, 'Target': tgt, 'InteractionType': 'quote', 'Phase': row['protest_phase']})
-
-    # 3. Mentions: author -> mentioned_user
-    mentions_df = clean_x[['author', 'mentions', 'protest_phase']].dropna()
-    for _, row in mentions_df.iterrows():
-        src = str(row['author']).strip().lstrip('@').lower()
-        m_list = [m.strip().lstrip('@').lower() for m in re.split(r'[,;\s]+', str(row['mentions'])) if m.strip()]
-        for tgt in m_list:
-            if src and tgt and src != tgt and tgt != 'none':
-                edges.append({'Source': src, 'Target': tgt, 'InteractionType': 'mention', 'Phase': row['protest_phase']})
-
-    edge_df = pd.DataFrame(edges)
-    print(f" -> Raw interaction edges extracted: {len(edge_df)}")
-
-    # Aggregate edge weights across interactions
-    agg_edges = edge_df.groupby(['Source', 'Target']).agg(
-        Weight=('InteractionType', 'count'),
-        InteractionTypes=('InteractionType', lambda x: ','.join(sorted(set(x)))),
-        PrimaryPhase=('Phase', lambda x: x.mode()[0] if not x.empty else 'Unknown')
-    ).reset_index()
-
-    agg_edges['Type'] = 'Directed'
-
-    # Build unique nodes dataset
-    all_users = set(agg_edges['Source']).union(set(agg_edges['Target']))
-    nodes_df = pd.DataFrame({'Id': list(all_users), 'Label': list(all_users)})
-
-    # Map user attributes (followers, verified status if available) using normalized author handle
-    author_meta = clean_x.groupby('author').agg(
-        followers=('author_followers', lambda x: pd.to_numeric(x, errors='coerce').max()),
-        verified=('verified', lambda x: any(str(v).lower() == 'true' for v in x)),
-        total_tweets=('id', 'count')
-    ).reset_index()
-
-    nodes_df = pd.merge(nodes_df, author_meta, left_on='Id', right_on='author', how='left')
-    nodes_df['followers'] = nodes_df['followers'].fillna(0).astype(int)
-    nodes_df['verified'] = nodes_df['verified'].fillna(False).astype(bool)
-    nodes_df['total_tweets'] = nodes_df['total_tweets'].fillna(0).astype(int)
-    nodes_df.drop(columns=['author'], inplace=True, errors='ignore')
-
-    # Export CSVs for Gephi & NetworkX analysis
-    nodes_path = os.path.join(out_network, "x_nodes.csv")
-    edges_path = os.path.join(out_network, "x_edges.csv")
-    nodes_df.to_csv(nodes_path, index=False, encoding='utf-8')
-    agg_edges.to_csv(edges_path, index=False, encoding='utf-8')
-
-    print(f" -> Exported Network: {len(nodes_df)} unique nodes, {len(agg_edges)} weighted directed edges.")
-    print(f"    - Nodes file: {nodes_path}")
-    print(f"    - Edges file: {edges_path}")
+    agg_edges, nodes_df = export_x_network(clean_x, out_network, write_nodes=True)
 
     # Summary table
     print("\n==================================================")

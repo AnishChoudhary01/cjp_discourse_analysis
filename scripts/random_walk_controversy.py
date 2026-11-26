@@ -316,6 +316,7 @@ def run_random_walk_controversy():
 
     root = project_root()
     x_edges = pd.read_csv(os.path.join(root, "output", "03_network_analysis", "x", "x_edges.csv"))
+    x_phase_edges = pd.read_csv(os.path.join(root, "output", "03_network_analysis", "x", "x_edges_by_phase.csv"))
     r_edges = pd.read_csv(os.path.join(root, "output", "03_network_analysis", "reddit", "edges.csv"))
     x_items = pd.read_csv(os.path.join(root, "output", "06_stance_analysis", "x", "x_tweets_with_stance.csv"), usecols=["Id", "stance_category"])
     r_items = pd.read_csv(os.path.join(root, "output", "06_stance_analysis", "reddit", "reddit_items_with_stance.csv"), usecols=["Id", "stance_category"])
@@ -328,7 +329,7 @@ def run_random_walk_controversy():
     rows.append(score_row("X", "Full", random_walk_controversy(x_graph, x_pro, x_anti)))
 
     for phase in ["Before", "Peak", "After"]:
-        phase_edges = x_edges[x_edges["PrimaryPhase"].astype(str).str.strip() == phase]
+        phase_edges = x_phase_edges[x_phase_edges["Phase"].astype(str).str.strip() == phase]
         phase_graph = undirected_graph(phase_edges)
         rows.append(score_row("X", phase, random_walk_controversy(phase_graph, x_pro, x_anti)))
 

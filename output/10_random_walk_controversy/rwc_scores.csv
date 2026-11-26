@@ -1,6 +1,6 @@
 Platform,Phase,Status,Component_Nodes,Component_Edges,Pro_Users,Anti_Users,Pro_Authorities,Anti_Authorities,Pro_Starts,Anti_Starts,P_Pro_to_Pro,P_Pro_to_Anti,P_Anti_to_Anti,P_Anti_to_Pro,RWC
-X,Full,Computed,916,1335,333,139,10,10,323,129,0.583,0.417,0.4482,0.5518,0.0312
-X,Before,Computed,220,293,84,38,8,3,76,35,0.719,0.281,0.2085,0.7915,-0.0725
-X,Peak,Computed,335,426,137,61,10,6,127,55,0.6664,0.3336,0.4399,0.5601,0.1063
-X,After,Computed,299,419,102,44,10,4,92,40,0.524,0.476,0.3135,0.6865,-0.1624
+X,Full,Computed,916,1335,333,139,10,10,323,129,0.5743,0.4257,0.4716,0.5284,0.046
+X,Before,Computed,222,311,84,39,8,3,76,36,0.7264,0.2736,0.2032,0.7968,-0.0704
+X,Peak,Computed,357,489,142,62,10,6,132,56,0.6634,0.3366,0.4755,0.5245,0.139
+X,After,Computed,306,428,104,44,10,4,94,40,0.432,0.568,0.4988,0.5012,-0.0692
 Reddit,Full,Computed,1086,1307,807,270,10,10,797,260,0.7315,0.2685,0.2998,0.7002,0.0313
